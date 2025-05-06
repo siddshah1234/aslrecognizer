@@ -31,7 +31,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin: 0.5rem 0;
+      margin-bottom: 2rem;
       transition: background-color 0.3s ease;
     }
 
@@ -39,7 +39,7 @@
       background-color: #2980b9;
     }
 
-    #webcam-container, #uploadedCanvas {
+    #webcam-container {
       margin-bottom: 1rem;
       border-radius: 8px;
       overflow: hidden;
@@ -74,11 +74,7 @@
 <body>
   <h1>Live Alphabet Recognition (A–Z)</h1>
   <button onclick="init()">Start Camera</button>
-  <input type="file" id="imageUpload" accept="image/*" />
-  <button onclick="predictFromImage()">Predict Uploaded Image</button>
-  
   <div id="webcam-container"></div>
-  <canvas id="uploadedCanvas" width="300" height="300" style="display: none;"></canvas>
   <div id="label-container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -90,6 +86,7 @@
     };
 
     const URL = "https://teachablemachine.withgoogle.com/models/gIYNl7V_o/";
+
     let model, webcam, labelContainer, maxPredictions;
     let labelMap = {};
 
@@ -109,13 +106,13 @@
       document.getElementById("webcam-container").appendChild(webcam.canvas);
       labelContainer = document.getElementById("label-container");
 
-      const classNames = model.getClassLabels().sort();
+      const classNames = model.getClassLabels().sort(); // Sort A–Z
 
       classNames.forEach((className) => {
         const div = document.createElement("div");
         div.className = "prediction";
-        div.id = `label-${className}`;
-        div.innerHTML = `<span>${className}</span><span>0.00</span>`;
+        div.id = label-${className};
+        div.innerHTML = <span>${className}</span><span>0.00</span>;
         labelContainer.appendChild(div);
         labelMap[className] = div;
       });
@@ -129,38 +126,8 @@
 
     async function predict() {
       const prediction = await model.predict(webcam.canvas);
-      updatePredictions(prediction);
-    }
 
-    async function predictFromImage() {
-      const fileInput = document.getElementById("imageUpload");
-      const canvas = document.getElementById("uploadedCanvas");
-      const ctx = canvas.getContext("2d");
-
-      if (fileInput.files.length === 0) {
-        alert("Please upload an image file.");
-        return;
-      }
-
-      const file = fileInput.files[0];
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        img.onload = async function () {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          const prediction = await model.predict(canvas);
-          updatePredictions(prediction);
-        };
-        img.src = event.target.result;
-      };
-
-      reader.readAsDataURL(file);
-    }
-
-    function updatePredictions(prediction) {
+      // Find the top prediction
       let topPrediction = prediction[0];
       for (let p of prediction) {
         if (p.probability > topPrediction.probability) {
@@ -168,9 +135,10 @@
         }
       }
 
+      // Update all predictions A–Z
       prediction.forEach(p => {
         const div = labelMap[p.className];
-        div.innerHTML = `<span class="${p.className === topPrediction.className ? 'highlight' : ''}">${p.className}</span><span>${p.probability.toFixed(2)}</span>`;
+        div.innerHTML = <span class="${p.className === topPrediction.className ? 'highlight' : ''}">${p.className}</span><span>${p.probability.toFixed(2)}</span>;
       });
     }
   </script>
