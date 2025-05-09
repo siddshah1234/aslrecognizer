@@ -20,7 +20,14 @@
     h1 {
       font-size: 2rem;
       color: #2c3e50;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #current-letter {
+      font-size: 6rem;
+      font-weight: 600;
+      color: #e74c3c;
+      margin-bottom: 2rem;
     }
 
     button {
@@ -73,6 +80,7 @@
 </head>
 <body>
   <h1>Live Alphabet Recognition (A–Z)</h1>
+  <div id="current-letter">–</div>
   <button onclick="init()">Start Camera</button>
   <div id="webcam-container"></div>
   <div id="label-container"></div>
@@ -80,7 +88,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
   <script type="text/javascript">
-    // Alert for ASL Alphabet Testing Recommendation
     window.onload = function() {
       alert("If you're testing this website, we recommend searching for the ASL (American Sign Language) alphabet and testing out the website using ASL hand signs for the letters A-Z.");
     };
@@ -106,7 +113,7 @@
       document.getElementById("webcam-container").appendChild(webcam.canvas);
       labelContainer = document.getElementById("label-container");
 
-      const classNames = model.getClassLabels().sort(); // Sort A–Z
+      const classNames = model.getClassLabels().sort();
 
       classNames.forEach((className) => {
         const div = document.createElement("div");
@@ -127,7 +134,6 @@
     async function predict() {
       const prediction = await model.predict(webcam.canvas);
 
-      // Find the top prediction
       let topPrediction = prediction[0];
       for (let p of prediction) {
         if (p.probability > topPrediction.probability) {
@@ -135,7 +141,8 @@
         }
       }
 
-      // Update all predictions A–Z
+      document.getElementById("current-letter").textContent = topPrediction.className;
+
       prediction.forEach(p => {
         const div = labelMap[p.className];
         div.innerHTML = `<span class="${p.className === topPrediction.className ? 'highlight' : ''}">${p.className}</span><span>${p.probability.toFixed(2)}</span>`;
