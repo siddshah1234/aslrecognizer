@@ -111,8 +111,8 @@
       classNames.forEach((className) => {
         const div = document.createElement("div");
         div.className = "prediction";
-        div.id = label-${className};
-        div.innerHTML = <span>${className}</span><span>0.00</span>;
+        div.id = `label-${className}`;
+        div.innerHTML = `<span>${className}</span><span>0.00</span>`;
         labelContainer.appendChild(div);
         labelMap[className] = div;
       });
@@ -138,7 +138,7 @@
       // Update all predictions A–Z
       prediction.forEach(p => {
         const div = labelMap[p.className];
-        div.innerHTML = <span class="${p.className === topPrediction.className ? 'highlight' : ''}">${p.className}</span><span>${p.probability.toFixed(2)}</span>;
+        div.innerHTML = `<span class="${p.className === topPrediction.className ? 'highlight' : ''}">${p.className}</span><span>${p.probability.toFixed(2)}</span>`;
       });
     }
   </script>
